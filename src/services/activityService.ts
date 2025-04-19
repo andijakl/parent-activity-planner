@@ -1,6 +1,14 @@
 import { Activity } from '../types';
-import { createItem, getItem, updateItem, deleteItem, queryItems } from './cosmosService';
+import { 
+  createDocument, 
+  getDocument, 
+  updateDocument, 
+  deleteDocument, 
+  queryDocuments, 
+  COLLECTIONS 
+} from './firestoreService';
 import { getUserFriends } from './userService';
+import { where, orderBy } from './firebase';
 
 // Create a new activity
 export async function createActivity(activity: Omit<Activity, 'id' | 'participants' | 'interestedUsers'>): Promise<Activity> {
@@ -11,30 +19,30 @@ export async function createActivity(activity: Omit<Activity, 'id' | 'participan
     interestedUsers: []
   };
   
-  return await createItem('activities', newActivity);
+  return await createDocument(COLLECTIONS.ACTIVITIES, newActivity);
 }
 
 // Get activity by ID
 export async function getActivityById(id: string): Promise<Activity> {
-  return await getItem('activities', id);
+  return await getDocument(COLLECTIONS.ACTIVITIES, id);
 }
 
 // Update activity
 export async function updateActivity(activity: Activity): Promise<Activity> {
-  return await updateItem('activities', activity.id, activity);
+  return await updateDocument(COLLECTIONS.ACTIVITIES, activity.id, activity);
 }
 
 // Delete activity
 export async function deleteActivity(id: string): Promise<void> {
-  await deleteItem('activities', id);
+  await deleteDocument(COLLECTIONS.ACTIVITIES, id);
 }
 
 // Get activities created by user
 export async function getUserActivities(userId: string): Promise<Activity[]> {
-  return await queryItems(
-    'activities',
-    'SELECT * FROM activities a WHERE a.createdBy = @userId ORDER BY a.date DESC',
-    [{ name: '@userId', value: userId }]
+  return await queryDocuments(
+    COLLECTIONS.ACTIVITIES,
+    [where('createdBy', '==', userId)],
+    [orderBy('date', 'desc')]
   );
 }
 
@@ -53,17 +61,34 @@ export async function getUserAndFriendsActivities(userId: string): Promise<Activ
       return [];
     }
     
-    // Cosmos DB doesn't directly support IN queries, so we need to use OR conditions
-    const queryText = 'SELECT * FROM activities a WHERE ' + 
-      allIds.map((_, index) => `a.createdBy = @userId${index}`).join(' OR ') +
-      ' ORDER BY a.date DESC';
+    // For a single user, query directly
+    if (allIds.length === 1) {
+      return await queryDocuments(
+        COLLECTIONS.ACTIVITIES,
+        [where('createdBy', '==', allIds[0])],
+        [orderBy('date', 'desc')]
+      );
+    }
     
-    const parameters = allIds.map((id, index) => ({
-      name: `@userId${index}`,
-      value: id
-    }));
+    // For multiple users, we need to perform separate queries and combine results
+    // Firestore doesn't support OR conditions like Cosmos DB
+    const activities: Activity[] = [];
     
-    return await queryItems('activities', queryText, parameters);
+    // Query activities for each user ID
+    for (const id of allIds) {
+      const userActivities = await queryDocuments(
+        COLLECTIONS.ACTIVITIES,
+        [where('createdBy', '==', id)],
+        [orderBy('date', 'desc')]
+      );
+      activities.push(...userActivities);
+    }
+    
+    // Sort combined results by date
+    return activities.sort((a, b) => {
+      // Sort by date in descending order
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
   } catch (error) {
     console.error("Error in getUserAndFriendsActivities:", error);
     return [];

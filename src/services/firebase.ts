@@ -7,9 +7,29 @@ import {
   Auth,
   UserCredential
 } from 'firebase/auth';
+import { 
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  Firestore,
+  DocumentData,
+  DocumentReference,
+  DocumentSnapshot,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+  Timestamp,
+  serverTimestamp
+} from 'firebase/firestore';
 
-// For Firebase configuration, you would normally load this from environment variables
-// This is a placeholder configuration, replace with your actual Firebase config
+// Firebase configuration from environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -19,9 +39,12 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
+// Authentication functions
 function createUserWithEmailAndPassword(auth: Auth, email: string, password: string): Promise<UserCredential> {
   return firebaseCreateUser(auth, email, password);
 }
@@ -30,9 +53,24 @@ function signInWithEmailAndPassword(auth: Auth, email: string, password: string)
   return firebaseSignIn(auth, email, password);
 }
 
+// Export all Firebase services and functions
 export { 
-  auth, 
+  app,
+  auth,
+  db,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  firebaseSignOut as signOut 
+  firebaseSignOut as signOut,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  Timestamp,
+  serverTimestamp
 };

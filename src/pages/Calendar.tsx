@@ -84,109 +84,188 @@ export default function CalendarPage() {
   };
   
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar section */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Calendar</h2>
-              <button
-                onClick={() => setShowActivityForm(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-              >
-                Create Activity
-              </button>
-            </div>
-            
-            <div className="calendar-container">
-              <Calendar
-                onChange={(value) => setDate(value as Date)}
-                value={date}
-                tileClassName={({ date }) => hasActivities(date) ? 'has-activities' : ''}
-              />
-            </div>
-            
-            <style>{`
-              .has-activities {
-                background-color: #dbeafe;
-                color: #1e40af;
-                font-weight: bold;
-              }
-              
-              .calendar-container {
-                width: 100%;
-                max-width: 100%;
-                overflow-x: auto;
-              }
-              
-              /* Override react-calendar styles */
-              .react-calendar {
-                width: 100%;
-                border: none;
-                font-family: inherit;
-              }
-              
-              .react-calendar__tile--active {
-                background-color: #3b82f6;
-                color: white;
-              }
-              
-              .react-calendar__tile--active.has-activities {
-                background-color: #2563eb;
-                color: white;
-              }
-            `}</style>
-          </div>
+    <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen pb-10">
+      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 md:mb-0">Activity Calendar</h1>
+          <button
+            onClick={() => setShowActivityForm(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150 text-sm font-medium shadow-sm"
+          >
+            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Create Activity
+          </button>
         </div>
-        
-        {/* Activities section */}
-        <div className="lg:col-span-2">
-          {showActivityForm ? (
-            <ActivityForm 
-              onSuccess={handleActivityCreated} 
-              onCancel={() => setShowActivityForm(false)} 
-            />
-          ) : (
-            <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-lg font-semibold mb-4">
-                Activities for {date.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'long', 
-                  day: 'numeric', 
-                  year: 'numeric' 
-                })}
-              </h2>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendar section */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+                <h2 className="text-lg font-semibold text-white">Calendar</h2>
+              </div>
               
-              {loading ? (
-                <div className="animate-pulse space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="bg-gray-100 h-40 rounded-lg"></div>
-                  ))}
-                </div>
-              ) : filteredActivities.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">No activities scheduled for this date.</p>
-                  <button
-                    onClick={() => setShowActivityForm(true)}
-                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              <div className="calendar-container p-4">
+                <Calendar
+                  onChange={(value) => setDate(value as Date)}
+                  value={date}
+                  tileClassName={({ date }) => hasActivities(date) ? 'has-activities' : ''}
+                />
+              </div>
+              
+              <style jsx>{`
+                .has-activities {
+                  background-color: rgba(59, 130, 246, 0.1);
+                  color: #1e40af;
+                  font-weight: bold;
+                  position: relative;
+                }
+                
+                .has-activities::after {
+                  content: '';
+                  position: absolute;
+                  bottom: 4px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  width: 6px;
+                  height: 6px;
+                  background-color: #3b82f6;
+                  border-radius: 50%;
+                }
+                
+                .calendar-container {
+                  width: 100%;
+                  max-width: 100%;
+                  overflow-x: auto;
+                }
+                
+                /* Override react-calendar styles */
+                .react-calendar {
+                  width: 100%;
+                  border: none;
+                  font-family: inherit;
+                }
+                
+                .react-calendar__tile--active {
+                  background-color: #3b82f6 !important;
+                  color: white !important;
+                }
+                
+                .react-calendar__tile--active.has-activities::after {
+                  background-color: white;
+                }
+                
+                .react-calendar__navigation button:enabled:hover,
+                .react-calendar__navigation button:enabled:focus {
+                  background-color: rgba(59, 130, 246, 0.1);
+                }
+                
+                .react-calendar__tile:enabled:hover,
+                .react-calendar__tile:enabled:focus {
+                  background-color: rgba(59, 130, 246, 0.1);
+                }
+                
+                .react-calendar__month-view__days__day--weekend {
+                  color: #ef4444;
+                }
+              `}</style>
+            </div>
+            
+            {/* Selected date summary */}
+            <div className="mt-6 bg-white rounded-lg shadow-md p-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {filteredActivities.length === 0 
+                  ? 'No activities scheduled for this date.' 
+                  : `${filteredActivities.length} ${filteredActivities.length === 1 ? 'activity' : 'activities'} scheduled.`}
+              </p>
+            </div>
+          </div>
+          
+          {/* Activities section */}
+          <div className="lg:col-span-2">
+            {showActivityForm ? (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-white">Create New Activity</h2>
+                  <button 
+                    onClick={() => setShowActivityForm(false)}
+                    className="text-white hover:text-blue-100 transition duration-150"
                   >
-                    Create Activity
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredActivities.map(activity => (
-                    <ActivityCard 
-                      key={activity.id} 
-                      activity={activity} 
-                      refreshActivities={refreshActivities}
-                    />
-                  ))}
+                <div className="p-4">
+                  <ActivityForm 
+                    onSuccess={handleActivityCreated} 
+                    onCancel={() => setShowActivityForm(false)} 
+                  />
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+                  <h2 className="text-lg font-semibold text-white">
+                    Activities for {date.toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      month: 'long', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}
+                  </h2>
+                </div>
+                
+                <div className="p-4">
+                  {loading ? (
+                    <div className="animate-pulse space-y-4">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="bg-gray-100 h-40 rounded-lg"></div>
+                      ))}
+                    </div>
+                  ) : filteredActivities.length === 0 ? (
+                    <div className="text-center py-12">
+                      <svg 
+                        className="h-16 w-16 text-gray-300 mx-auto mb-4"
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="1" 
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" 
+                        />
+                      </svg>
+                      <p className="text-gray-500 mb-4">No activities scheduled for this date.</p>
+                      <button
+                        onClick={() => setShowActivityForm(true)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150"
+                      >
+                        Create Activity
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredActivities.map(activity => (
+                        <ActivityCard 
+                          key={activity.id} 
+                          activity={activity} 
+                          refreshActivities={refreshActivities}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
