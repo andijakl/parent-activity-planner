@@ -97,38 +97,87 @@ This guide provides detailed instructions for setting up and deploying the Paren
    VITE_COSMOS_DATABASE_ID=ParentActivities
    ```
 
-## Azure App Service Setup
+## Hosting Options for Static Site Deployment
 
-### 1. Create an App Service Plan
+Since this is a static single-page application (SPA), you have two primary hosting options that are simpler and more cost-effective than traditional Azure App Service deployment.
+
+### Option 1: Firebase Hosting (Recommended)
+
+Firebase Hosting is the simplest option since you're already using Firebase for authentication, and it's optimized for serving static sites with SPA routing.
+
+#### 1. Set Up Firebase Hosting
+1. Make sure you have the Firebase CLI installed:
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. Login to Firebase:
+   ```bash
+   firebase login
+   ```
+
+3. Initialize Firebase Hosting in your project directory:
+   ```bash
+   firebase init hosting
+   ```
+   - Select the Firebase project you created earlier
+   - Specify `dist` as your public directory
+   - Configure as a single-page app (answer Yes to "Configure as a single-page app")
+   - Don't overwrite your index.html
+
+4. Create a `.env` file with all your environment variables (Firebase and Cosmos DB)
+
+5. Build the application:
+   ```bash
+   npm run build
+   ```
+
+6. Deploy to Firebase Hosting:
+   ```bash
+   firebase deploy --only hosting
+   ```
+
+7. Your app will be available at `https://<your-project-id>.web.app`
+
+#### 2. Set Up Automatic Deployment with GitHub Actions
+1. In your project directory, run:
+   ```bash
+   firebase init hosting:github
+   ```
+   
+2. This will set up GitHub Actions to automatically build and deploy your project when you push to your repository.
+
+3. The workflow will:
+   - Install dependencies
+   - Build the application
+   - Deploy to Firebase Hosting
+
+### Option 2: Azure Static Web Apps
+
+If you prefer to keep everything in the Azure ecosystem (since Cosmos DB is already on Azure), Azure Static Web Apps is a good alternative.
+
+#### 1. Create an Azure Static Web App
 1. Go to the Azure Portal
 2. Click "Create a resource"
-3. Search for "App Service Plan" and select it
+3. Search for "Static Web App" and select it
 4. Click "Create"
-5. Select your subscription and resource group (use the same one as Cosmos DB for easier management)
-6. Enter a name for your plan (e.g., "parent-activity-plan")
-7. Select the same region as your Cosmos DB
-8. For minimal costs:
-   - Operating System: Linux
-   - Pricing Plan: B1 (Basic)
-9. Click "Review + create", then "Create"
+5. Select your subscription and resource group (use the same one as Cosmos DB)
+6. Enter a name for your static web app
+7. Select a hosting plan (Free tier is sufficient for most use cases)
+8. Choose the region closest to your users
+9. Under "Deployment details":
+   - Select GitHub as the source
+   - Connect your GitHub account and select your repository
+10. Under "Build details":
+    - Select "React" as the build preset
+    - Set "App location" to "/"
+    - Set "Output location" to "dist"
+11. Click "Review + create", then "Create"
 
-### 2. Create a Web App
-1. Once your App Service Plan is created, go back to "Create a resource"
-2. Search for "Web App" and select it
-3. Click "Create"
-4. Select your subscription and the same resource group
-5. Enter a name for your web app (this will be part of your app's URL, e.g., "parent-activity-planner")
-6. Select "Code" as the Publish option
-7. Select "Node" as the Runtime stack and choose the latest LTS version
-8. Select the region where your App Service Plan is located
-9. For "Windows Plan", select the App Service Plan you just created
-10. Click "Review + create", then "Create"
-
-### 3. Configure Environment Variables
-1. Once your Web App is created, navigate to it
+#### 2. Configure Environment Variables
+1. Once your Static Web App is created, navigate to it in the Azure Portal
 2. Go to "Configuration" in the left menu
-3. Under "Application settings", click "New application setting"
-4. Add all the environment variables from your `.env` file:
+3. Add all your environment variables:
    ```
    VITE_FIREBASE_API_KEY
    VITE_FIREBASE_AUTH_DOMAIN
@@ -140,51 +189,12 @@ This guide provides detailed instructions for setting up and deploying the Paren
    VITE_COSMOS_KEY
    VITE_COSMOS_DATABASE_ID
    ```
-5. Click "Save"
+4. Click "Save"
 
-## Building and Deploying the Application
-
-### 1. Build the Application
-1. On your local machine, make sure all environment variables are set in `.env`
-2. Run the build command:
-   ```bash
-   npm run build
-   ```
-3. This will create a `dist` folder with the built application
-
-### 2. Deploy to Azure App Service
-
-#### Option 1: Deploy using Azure CLI
-1. Install the Azure CLI if you haven't already
-2. Log in to Azure:
-   ```bash
-   az login
-   ```
-3. Create a zip file of the dist folder:
-   ```bash
-   cd dist
-   zip -r ../dist.zip *
-   cd ..
-   ```
-4. Deploy the zip file:
-   ```bash
-   az webapp deployment source config-zip --resource-group <your-resource-group> --name <your-app-name> --src dist.zip
-   ```
-
-#### Option 2: Set up Continuous Deployment with GitHub Actions
-1. Push your code to a GitHub repository
-2. In the Azure Portal, navigate to your Web App
-3. Go to "Deployment Center"
-4. Select "GitHub" as the source
-5. Follow the prompts to connect your GitHub account and select your repository
-6. Select "GitHub Actions" as the build provider
-7. Select "Node" as the runtime stack
-8. Click "Save"
-
-This will create a GitHub Actions workflow file in your repository. On the next push to your repository, GitHub Actions will build and deploy your application automatically.
+This creates a GitHub Actions workflow file in your repository. On the next push, GitHub Actions will build and deploy your application automatically.
 
 ### 3. Verify Deployment
-1. Navigate to your App Service URL (`https://<your-app-name>.azurewebsites.net`)
+1. Navigate to your hosting URL (either Firebase or Azure Static Web Apps)
 2. Verify that the application loads correctly
 3. Test user registration, authentication, and other features
 
