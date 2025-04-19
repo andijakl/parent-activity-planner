@@ -57,9 +57,18 @@ export async function createItem(containerName: string, item: any) {
 }
 
 export async function getItem(containerName: string, id: string) {
-  const container = getContainer(containerName);
-  const { resource } = await container.item(id).read();
-  return resource;
+  try {
+    const container = getContainer(containerName);
+    const { resource } = await container.item(id).read();
+    return resource;
+  } catch (error: any) {
+    // Rethrow error with more context
+    console.error(`Error getting item from ${containerName} with ID ${id}:`, error);
+    if (error.code === 404 || error.message?.includes('404')) {
+      throw new Error(`Item not found in ${containerName} with ID ${id}`);
+    }
+    throw error;
+  }
 }
 
 export async function updateItem(containerName: string, id: string, item: any) {

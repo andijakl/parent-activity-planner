@@ -9,7 +9,18 @@ export async function createUser(user: User): Promise<User> {
 
 // Get user by ID
 export async function getUserById(id: string): Promise<User> {
-  return await getItem('users', id);
+  try {
+    return await getItem('users', id);
+  } catch (error) {
+    console.error(`Error fetching user with ID ${id}:`, error);
+    // Return a default user with empty friends array if not found
+    return {
+      id,
+      email: '',
+      childNickname: '',
+      friends: []
+    };
+  }
 }
 
 // Get user by email
@@ -93,6 +104,11 @@ export async function acceptInvitation(code: string, acceptingUserId: string): P
 export async function getUserFriends(userId: string): Promise<User[]> {
   const user = await getUserById(userId);
   const friends: User[] = [];
+  
+  // Handle case where user might not have friends property or it's not an array
+  if (!user.friends || !Array.isArray(user.friends)) {
+    return friends;
+  }
   
   // Fetch each friend's details
   for (const friendId of user.friends) {

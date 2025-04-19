@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut } from '../services/firebase';
-import { createUser, getUserByEmail } from '../services/userService';
+import { createUser, getUserByEmail, getUserById } from '../services/userService';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -70,11 +70,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          const userInfo = await getUserByEmail(user.email!);
-          setCurrentUser(userInfo);
+          // First try to get user by email
+          try {
+            const userInfo = await getUserByEmail(user.email!);
+            setCurrentUser(userInfo);
+          } catch (emailError) {
+            console.warn('Failed to get user by email, trying by ID:', emailError);
+            // If that fails, try by ID
+            const userById = await getUserById(user.uid);
+            setCurrentUser(userById);
+          }
         } catch (error) {
           console.error('Error fetching user data:', error);
-          setCurrentUser(null);
+          // Create minimal user object to avoid null issues
+          setCurrentUser({
+            id: user.uid,
+            email: user.email || '',
+            childNickname: '',
+            friends: []
+          });
         }
       } else {
         setCurrentUser(null);

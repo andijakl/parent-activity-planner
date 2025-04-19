@@ -24,3 +24,5 @@ dist.zip
 *.njsproj
 *.sln
 *.sw?
+.firebase/hosting.ZGlzdA.cache
+.firebaserc

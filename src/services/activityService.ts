@@ -40,24 +40,34 @@ export async function getUserActivities(userId: string): Promise<Activity[]> {
 
 // Get activities for user and friends
 export async function getUserAndFriendsActivities(userId: string): Promise<Activity[]> {
-  // Get user's friends
-  const friends = await getUserFriends(userId);
-  const friendIds = friends.map(friend => friend.id);
-  
-  // Include user's own ID
-  const allIds = [userId, ...friendIds];
-  
-  // Cosmos DB doesn't directly support IN queries, so we need to use OR conditions
-  const queryText = 'SELECT * FROM activities a WHERE ' + 
-    allIds.map((_, index) => `a.createdBy = @userId${index}`).join(' OR ') +
-    ' ORDER BY a.date DESC';
-  
-  const parameters = allIds.map((id, index) => ({
-    name: `@userId${index}`,
-    value: id
-  }));
-  
-  return await queryItems('activities', queryText, parameters);
+  try {
+    // Get user's friends
+    const friends = await getUserFriends(userId);
+    const friendIds = friends.map(friend => friend.id);
+    
+    // Include user's own ID
+    const allIds = [userId, ...friendIds].filter(Boolean); // Filter out any null/undefined IDs
+    
+    if (allIds.length === 0) {
+      console.warn("No valid user IDs for activity query");
+      return [];
+    }
+    
+    // Cosmos DB doesn't directly support IN queries, so we need to use OR conditions
+    const queryText = 'SELECT * FROM activities a WHERE ' + 
+      allIds.map((_, index) => `a.createdBy = @userId${index}`).join(' OR ') +
+      ' ORDER BY a.date DESC';
+    
+    const parameters = allIds.map((id, index) => ({
+      name: `@userId${index}`,
+      value: id
+    }));
+    
+    return await queryItems('activities', queryText, parameters);
+  } catch (error) {
+    console.error("Error in getUserAndFriendsActivities:", error);
+    return [];
+  }
 }
 
 // Express interest in an activity
