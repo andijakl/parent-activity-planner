@@ -51,7 +51,7 @@ This guide provides detailed instructions for setting up and deploying the Paren
 2. Click "Create a resource"
 3. Search for "Cosmos DB" and select "Azure Cosmos DB"
 4. Click "Create"
-5. Select "Core (SQL)" as the API
+5. Select "NoSQL" as the API
 6. Choose your subscription and resource group (create a new one if necessary)
 7. Enter an account name (e.g., "parent-activity-db")
 8. Choose the location closest to your users

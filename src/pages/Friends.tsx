@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserFriends, getInvitationByCode, acceptInvitation } from '../services/userService';
+import { getUserFriends, acceptInvitation } from '../services/userService';
 import { User } from '../types';
 import FriendInviteForm from '../components/FriendInviteForm';
 

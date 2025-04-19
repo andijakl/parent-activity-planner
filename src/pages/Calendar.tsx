@@ -7,7 +7,7 @@ import { getUserAndFriendsActivities } from '../services/activityService';
 import { Activity } from '../types';
 import ActivityCard from '../components/ActivityCard';
 import ActivityForm from '../components/ActivityForm';
-import { formatDateToString, groupActivitiesByDate } from '../utils/helpers';
+import { formatDateToString } from '../utils/helpers';
 
 export default function CalendarPage() {
   const { currentUser } = useAuth();
@@ -101,13 +101,13 @@ export default function CalendarPage() {
             
             <div className="calendar-container">
               <Calendar
-                onChange={setDate}
+                onChange={(value) => setDate(value as Date)}
                 value={date}
                 tileClassName={({ date }) => hasActivities(date) ? 'has-activities' : ''}
               />
             </div>
             
-            <style jsx>{`
+            <style>{`
               .has-activities {
                 background-color: #dbeafe;
                 color: #1e40af;

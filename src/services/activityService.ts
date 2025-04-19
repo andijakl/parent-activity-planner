@@ -1,6 +1,6 @@
-import { Activity, User } from '../types';
+import { Activity } from '../types';
 import { createItem, getItem, updateItem, deleteItem, queryItems } from './cosmosService';
-import { getUserById, getUserFriends } from './userService';
+import { getUserFriends } from './userService';
 
 // Create a new activity
 export async function createActivity(activity: Omit<Activity, 'id' | 'participants' | 'interestedUsers'>): Promise<Activity> {
