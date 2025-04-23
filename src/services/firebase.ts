@@ -4,6 +4,8 @@ import {
   createUserWithEmailAndPassword as firebaseCreateUser, 
   signInWithEmailAndPassword as firebaseSignIn,
   signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  signInWithPopup,
   Auth,
   UserCredential
 } from 'firebase/auth';
@@ -19,12 +21,6 @@ import {
   query,
   where,
   orderBy,
-  Firestore,
-  DocumentData,
-  DocumentReference,
-  DocumentSnapshot,
-  QueryDocumentSnapshot,
-  QuerySnapshot,
   Timestamp,
   serverTimestamp
 } from 'firebase/firestore';
@@ -43,6 +39,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
 // Authentication functions
 function createUserWithEmailAndPassword(auth: Auth, email: string, password: string): Promise<UserCredential> {
@@ -53,13 +50,19 @@ function signInWithEmailAndPassword(auth: Auth, email: string, password: string)
   return firebaseSignIn(auth, email, password);
 }
 
+function signInWithGoogle(): Promise<UserCredential> {
+  return signInWithPopup(auth, googleProvider);
+}
+
 // Export all Firebase services and functions
 export { 
   app,
   auth,
   db,
+  googleProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithGoogle,
   firebaseSignOut as signOut,
   collection,
   doc,

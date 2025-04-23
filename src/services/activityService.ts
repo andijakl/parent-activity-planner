@@ -24,12 +24,26 @@ export async function createActivity(activity: Omit<Activity, 'id' | 'participan
 
 // Get activity by ID
 export async function getActivityById(id: string): Promise<Activity> {
-  return await getDocument(COLLECTIONS.ACTIVITIES, id);
+  const result = await getDocument<Activity>(COLLECTIONS.ACTIVITIES, id);
+  // If some properties are missing, add default values
+  // This fixes typescript errors when properties might be missing
+  const activity: Activity = {
+    id: result.id,
+    createdBy: result.createdBy || '',
+    name: result.name || '',
+    date: result.date || '',
+    time: result.time || '',
+    location: result.location || '',
+    participants: Array.isArray(result.participants) ? result.participants : [],
+    interestedUsers: Array.isArray(result.interestedUsers) ? result.interestedUsers : []
+  };
+  return activity;
 }
 
 // Update activity
 export async function updateActivity(activity: Activity): Promise<Activity> {
-  return await updateDocument(COLLECTIONS.ACTIVITIES, activity.id, activity);
+  const result = await updateDocument<Activity>(COLLECTIONS.ACTIVITIES, activity.id, activity);
+  return result;
 }
 
 // Delete activity
@@ -39,7 +53,7 @@ export async function deleteActivity(id: string): Promise<void> {
 
 // Get activities created by user
 export async function getUserActivities(userId: string): Promise<Activity[]> {
-  return await queryDocuments(
+  return await queryDocuments<Activity>(
     COLLECTIONS.ACTIVITIES,
     [where('createdBy', '==', userId)],
     [orderBy('date', 'desc')]
@@ -63,7 +77,7 @@ export async function getUserAndFriendsActivities(userId: string): Promise<Activ
     
     // For a single user, query directly
     if (allIds.length === 1) {
-      return await queryDocuments(
+      return await queryDocuments<Activity>(
         COLLECTIONS.ACTIVITIES,
         [where('createdBy', '==', allIds[0])],
         [orderBy('date', 'desc')]
@@ -76,7 +90,7 @@ export async function getUserAndFriendsActivities(userId: string): Promise<Activ
     
     // Query activities for each user ID
     for (const id of allIds) {
-      const userActivities = await queryDocuments(
+      const userActivities = await queryDocuments<Activity>(
         COLLECTIONS.ACTIVITIES,
         [where('createdBy', '==', id)],
         [orderBy('date', 'desc')]

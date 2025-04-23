@@ -1,7 +1,5 @@
-import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { initializeCosmosDB } from './services/cosmosService';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Home';
@@ -11,12 +9,6 @@ import Calendar from './pages/Calendar';
 import Friends from './pages/Friends';
 
 function App() {
-  useEffect(() => {
-    // Initialize CosmosDB connection
-    initializeCosmosDB().catch(error => {
-      console.error('Failed to initialize CosmosDB:', error);
-    });
-  }, []);
 
   return (
     <Router>

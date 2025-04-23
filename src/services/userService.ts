@@ -17,7 +17,14 @@ export async function createUser(user: User): Promise<User> {
 // Get user by ID
 export async function getUserById(id: string): Promise<User> {
   try {
-    return await getDocument(COLLECTIONS.USERS, id);
+    const result = await getDocument<User>(COLLECTIONS.USERS, id);
+    // Ensure we have a valid User object
+    return {
+      id,
+      email: result.email || '',
+      childNickname: result.childNickname || '',
+      friends: Array.isArray(result.friends) ? result.friends : []
+    };
   } catch (error) {
     console.error(`Error fetching user with ID ${id}:`, error);
     // Return a default user with empty friends array if not found
@@ -33,7 +40,7 @@ export async function getUserById(id: string): Promise<User> {
 // Get user by email
 export async function getUserByEmail(email: string): Promise<User> {
   try {
-    const users = await queryDocuments(
+    const users = await queryDocuments<User>(
       COLLECTIONS.USERS,
       [where('email', '==', email)]
     );
@@ -51,7 +58,8 @@ export async function getUserByEmail(email: string): Promise<User> {
 
 // Update user
 export async function updateUser(user: User): Promise<User> {
-  return await updateDocument(COLLECTIONS.USERS, user.id, user);
+  const result = await updateDocument<User>(COLLECTIONS.USERS, user.id, user);
+  return result;
 }
 
 // Create friend invitation
@@ -70,7 +78,7 @@ export async function createInvitation(fromUserId: string, email: string): Promi
 // Get invitation by code
 export async function getInvitationByCode(code: string): Promise<FriendInvitation> {
   try {
-    const invitations = await queryDocuments(
+    const invitations = await queryDocuments<FriendInvitation>(
       COLLECTIONS.INVITATIONS,
       [where('code', '==', code)]
     );
@@ -79,7 +87,7 @@ export async function getInvitationByCode(code: string): Promise<FriendInvitatio
       throw new Error(`Invitation with code ${code} not found`);
     }
     
-    return invitations[0];
+    return invitations[0] as FriendInvitation;
   } catch (error) {
     console.error(`Error fetching invitation with code ${code}:`, error);
     throw error;

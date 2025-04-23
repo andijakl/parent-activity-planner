@@ -7,9 +7,7 @@ import {
   setDoc, 
   updateDoc, 
   deleteDoc, 
-  query, 
-  where, 
-  orderBy,
+  query,
   serverTimestamp
 } from './firebase';
 
@@ -39,13 +37,14 @@ export async function createDocument(collectionName: string, data: any) {
 }
 
 // Get a document by ID
-export async function getDocument(collectionName: string, id: string) {
+export async function getDocument<T extends { id: string }>(collectionName: string, id: string): Promise<T> {
   try {
     const docRef = doc(db, collectionName, id);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      const docData = docSnap.data();
+      return docData ? { id: docSnap.id, ...docData } as T : { id: docSnap.id } as T;
     }
     throw new Error(`Document not found in ${collectionName} with ID ${id}`);
   } catch (error) {
@@ -55,17 +54,18 @@ export async function getDocument(collectionName: string, id: string) {
 }
 
 // Update a document
-export async function updateDocument(collectionName: string, id: string, data: any) {
+export async function updateDocument<T extends { id: string }>(collectionName: string, id: string, docData: any): Promise<T> {
   try {
     const docRef = doc(db, collectionName, id);
     await updateDoc(docRef, {
-      ...data,
+      ...docData,
       updatedAt: serverTimestamp()
     });
     
     // Get the updated document to return
     const updatedDoc = await getDoc(docRef);
-    return { id, ...updatedDoc.data() };
+    const fetchedData = updatedDoc.data();
+    return fetchedData ? { id, ...fetchedData } as T : { id } as T;
   } catch (error) {
     console.error(`Error updating document in ${collectionName}:`, error);
     throw error;
@@ -84,7 +84,11 @@ export async function deleteDocument(collectionName: string, id: string) {
 }
 
 // Query documents
-export async function queryDocuments(collectionName: string, conditions: any[] = [], sortOptions: any[] = []) {
+export async function queryDocuments<T extends { id: string }>(
+  collectionName: string, 
+  conditions: any[] = [], 
+  sortOptions: any[] = []
+): Promise<T[]> {
   try {
     let queryRef: any = collection(db, collectionName);
     
@@ -99,10 +103,11 @@ export async function queryDocuments(collectionName: string, conditions: any[] =
     }
     
     const querySnapshot = await getDocs(queryRef);
-    const documents: any[] = [];
+    const documents: T[] = [];
     
     querySnapshot.forEach((doc) => {
-      documents.push({ id: doc.id, ...doc.data() });
+      const docData = doc.data();
+      documents.push(docData ? { id: doc.id, ...docData } as T : { id: doc.id } as T);
     });
     
     return documents;

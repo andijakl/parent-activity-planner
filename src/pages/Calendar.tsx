@@ -115,7 +115,7 @@ export default function CalendarPage() {
                 />
               </div>
               
-              <style jsx>{`
+              <style>{`
                 .has-activities {
                   background-color: rgba(59, 130, 246, 0.1);
                   color: #1e40af;
