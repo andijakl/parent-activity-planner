@@ -1,164 +1,422 @@
-import { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import {
+  Box,
+  Flex,
+  Text,
+  IconButton,
+  Button,
+  Stack,
+  Collapse,
+  Icon,
+  Link,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  useColorModeValue,
+  useDisclosure,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  HStack,
+} from '@chakra-ui/react';
+import { 
+  HamburgerIcon, 
+  CloseIcon, 
+  ChevronDownIcon, 
+  ChevronRightIcon,
+} from '@chakra-ui/icons';
 
-export default function Navbar() {
-  const { currentUser, signOut } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+// Define a type for icon props
+type IconProps = Record<string, unknown>;
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-  
+// Custom Sun Icon
+function CustomSunIcon(props: IconProps) {
   return (
-    <nav className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo and brand */}
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <svg 
-                className="h-8 w-8 mr-2 text-blue-200" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M12 3v1m0 16v1m-9-9h1M21 12h1m-4.8-4.8L18 8m0 0l-1.8-1.8M6 16l-1.8 1.8M18 16l1.8 1.8M6 8L4.2 6.2" 
-                />
-              </svg>
-              <span className="text-xl font-bold">ParentPlanner</span>
-            </Link>
-          </div>
-          
-          {/* Desktop menu */}
-          <div className="hidden md:flex items-center">
-            {currentUser ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium bg-blue-500 px-3 py-1 rounded-full">
-                  {currentUser.childNickname}'s Parent
-                </span>
-                <div className="flex space-x-2">
-                  <Link 
-                    to="/calendar" 
-                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition duration-150"
-                  >
-                    Calendar
-                  </Link>
-                  <Link 
-                    to="/friends" 
-                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition duration-150"
-                  >
-                    Friends
-                  </Link>
-                  <button
-                    onClick={signOut}
-                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition duration-150"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex space-x-2">
-                <Link 
-                  to="/signin" 
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition duration-150"
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  to="/signup" 
-                  className="px-3 py-2 rounded-md text-sm font-medium bg-white text-blue-600 hover:bg-gray-100 transition duration-150"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
-          </div>
-          
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-blue-700 focus:outline-none"
-            >
-              <svg 
-                className={`h-6 w-6 ${mobileMenuOpen ? 'hidden' : 'block'}`} 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg 
-                className={`h-6 w-6 ${mobileMenuOpen ? 'block' : 'hidden'}`} 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div className={`${mobileMenuOpen ? 'block' : 'hidden'} md:hidden bg-blue-700`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          {currentUser ? (
-            <>
-              <div className="text-sm font-medium text-center py-2 px-3 bg-blue-800 rounded-md mb-2">
-                {currentUser.childNickname}'s Parent
-              </div>
-              <Link 
-                to="/calendar" 
-                className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-800"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Calendar
-              </Link>
-              <Link 
-                to="/friends" 
-                className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-800"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Friends
-              </Link>
-              <button
-                onClick={() => {
-                  signOut();
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-800"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link 
-                to="/signin" 
-                className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-800"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <Link 
-                to="/signup" 
-                className="block px-3 py-2 rounded-md text-base font-medium bg-white text-blue-600 hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M12 3v1m0 16v1m-9-9h1M21 12h1m-4.8-4.8L18 8m0 0l-1.8-1.8M6 16l-1.8 1.8M18 16l1.8 1.8M6 8L4.2 6.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+      />
+    </Icon>
   );
 }
+
+// Custom People Icon
+function CustomPeopleIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+      />
+    </Icon>
+  );
+}
+
+// Custom Calendar Icon
+function CustomCalendarIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+      />
+    </Icon>
+  );
+}
+
+export default function Navbar() {
+  const { isOpen, onToggle } = useDisclosure();
+  const { currentUser, signOut } = useAuth();
+
+  return (
+    <Box>
+      <Flex
+        bg={useColorModeValue('white', 'gray.800')}
+        color={useColorModeValue('gray.600', 'white')}
+        minH={'60px'}
+        py={{ base: 2 }}
+        px={{ base: 4 }}
+        borderBottom={1}
+        borderStyle={'solid'}
+        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        align={'center'}
+        boxShadow="sm"
+      >
+        <Flex
+          flex={{ base: 1, md: 'auto' }}
+          ml={{ base: -2 }}
+          display={{ base: 'flex', md: 'none' }}
+        >
+          <IconButton
+            onClick={onToggle}
+            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+            variant={'ghost'}
+            aria-label={'Toggle Navigation'}
+          />
+        </Flex>
+        
+        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
+          <Link
+            as={RouterLink}
+            to="/"
+            textAlign={useColorModeValue('left', 'center')}
+            fontFamily={'heading'}
+            color={useColorModeValue('gray.800', 'white')}
+            _hover={{
+              textDecoration: 'none',
+            }}
+          >
+            <HStack>
+              <CustomSunIcon w={6} h={6} color="brand.500" />
+              <Text
+                fontWeight={700}
+                fontSize="lg"
+                bgGradient="linear(to-r, brand.500, brand.700)"
+                bgClip="text"
+              >
+                ParentPlanner
+              </Text>
+            </HStack>
+          </Link>
+
+          <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+            <DesktopNav />
+          </Flex>
+        </Flex>
+
+        <Stack
+          flex={{ base: 1, md: 0 }}
+          justify={'flex-end'}
+          direction={'row'}
+          spacing={6}
+        >
+          {currentUser ? (
+            <Menu>
+              <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
+                <HStack>
+                  <Avatar
+                    size={'sm'}
+                    src={''}
+                    name={`${currentUser.childNickname}'s Parent`}
+                    bg="brand.500"
+                  />
+                  <Text display={{ base: 'none', md: 'flex' }}>
+                    {currentUser.childNickname}'s Parent
+                  </Text>
+                </HStack>
+              </MenuButton>
+              <MenuList zIndex={2}>
+                <MenuItem as={RouterLink} to="/calendar" icon={<CustomCalendarIcon fontSize="1.2em" />}>
+                  Calendar
+                </MenuItem>
+                <MenuItem as={RouterLink} to="/friends" icon={<CustomPeopleIcon fontSize="1.2em" />}>
+                  Friends
+                </MenuItem>
+                <MenuItem onClick={signOut}>Sign Out</MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <>
+              <Button
+                as={RouterLink}
+                fontSize={'sm'}
+                fontWeight={400}
+                variant={'link'}
+                to={'/signin'}
+              >
+                Sign In
+              </Button>
+              <Button
+                as={RouterLink}
+                display={{ base: 'none', md: 'inline-flex' }}
+                fontSize={'sm'}
+                fontWeight={600}
+                to={'/signup'}
+                colorScheme="brand"
+                variant="solid"
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
+        </Stack>
+      </Flex>
+
+      <Collapse in={isOpen} animateOpacity>
+        <MobileNav />
+      </Collapse>
+    </Box>
+  );
+}
+
+const DesktopNav = () => {
+  const { currentUser } = useAuth();
+  const linkColor = useColorModeValue('gray.600', 'gray.200');
+  const linkHoverColor = useColorModeValue('brand.500', 'white');
+  const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+
+  if (!currentUser) return null;
+
+  return (
+    <Stack direction={'row'} spacing={4}>
+      {NAV_ITEMS.map((navItem) => (
+        <Box key={navItem.label}>
+          <Popover trigger={'hover'} placement={'bottom-start'}>
+            <PopoverTrigger>
+              <Link
+                as={RouterLink}
+                p={2}
+                to={navItem.href ?? '#'}
+                fontSize={'sm'}
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: 'none',
+                  color: linkHoverColor,
+                }}
+              >
+                <HStack spacing={1}>
+                  {navItem.icon}
+                  <Text>{navItem.label}</Text>
+                </HStack>
+              </Link>
+            </PopoverTrigger>
+
+            {navItem.children && (
+              <PopoverContent
+                border={0}
+                boxShadow={'xl'}
+                bg={popoverContentBgColor}
+                p={4}
+                rounded={'xl'}
+                minW={'sm'}
+              >
+                <Stack>
+                  {navItem.children.map((child) => (
+                    <DesktopSubNav key={child.label} {...child} />
+                  ))}
+                </Stack>
+              </PopoverContent>
+            )}
+          </Popover>
+        </Box>
+      ))}
+    </Stack>
+  );
+};
+
+const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
+  return (
+    <Link
+      as={RouterLink}
+      to={href ?? '#'}
+      role={'group'}
+      display={'block'}
+      p={2}
+      rounded={'md'}
+      _hover={{ bg: useColorModeValue('brand.50', 'gray.900') }}
+    >
+      <Stack direction={'row'} align={'center'}>
+        <Box>
+          <Text
+            transition={'all .3s ease'}
+            _groupHover={{ color: 'brand.500' }}
+            fontWeight={500}
+          >
+            {label}
+          </Text>
+          <Text fontSize={'sm'}>{subLabel}</Text>
+        </Box>
+        <Flex
+          transition={'all .3s ease'}
+          transform={'translateX(-10px)'}
+          opacity={0}
+          _groupHover={{ opacity: 1, transform: 'translateX(0)' }}
+          justify={'flex-end'}
+          align={'center'}
+          flex={1}
+        >
+          <Icon color={'brand.500'} w={5} h={5} as={ChevronRightIcon} />
+        </Flex>
+      </Stack>
+    </Link>
+  );
+};
+
+const MobileNav = () => {
+  const { currentUser, signOut } = useAuth();
+  const bgColor = useColorModeValue('white', 'gray.800');
+  
+  if (!currentUser) {
+    return (
+      <Stack
+        bg={bgColor}
+        p={4}
+        display={{ md: 'none' }}
+      >
+        <MobileNavItem label="Sign In" href="/signin" />
+        <MobileNavItem label="Sign Up" href="/signup" />
+      </Stack>
+    );
+  }
+  
+  return (
+    <Stack
+      bg={bgColor}
+      p={4}
+      display={{ md: 'none' }}
+    >
+      <Box py={2} px={3} rounded="md" bg="brand.50" mb={2}>
+        <Text fontWeight={600} color="brand.700">
+          {currentUser.childNickname}'s Parent
+        </Text>
+      </Box>
+      
+      {NAV_ITEMS.map((navItem) => (
+        <MobileNavItem key={navItem.label} {...navItem} />
+      ))}
+      
+      <Box pt={2}>
+        <Button 
+          width="full" 
+          onClick={signOut}
+          variant="outline"
+          colorScheme="brand"
+        >
+          Sign Out
+        </Button>
+      </Box>
+    </Stack>
+  );
+};
+
+const MobileNavItem = ({ label, children, href, icon }: NavItem) => {
+  const { isOpen, onToggle } = useDisclosure();
+
+  return (
+    <Stack spacing={4} onClick={children && onToggle}>
+      <Flex
+        py={2}
+        as={RouterLink}
+        to={href ?? '#'}
+        justify={'space-between'}
+        align={'center'}
+        _hover={{
+          textDecoration: 'none',
+        }}
+      >
+        <HStack spacing={2}>
+          {icon}
+          <Text
+            fontWeight={600}
+            color={useColorModeValue('gray.600', 'gray.200')}
+          >
+            {label}
+          </Text>
+        </HStack>
+        {children && (
+          <Icon
+            as={ChevronDownIcon}
+            transition={'all .25s ease-in-out'}
+            transform={isOpen ? 'rotate(180deg)' : ''}
+            w={6}
+            h={6}
+          />
+        )}
+      </Flex>
+
+      <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
+        <Stack
+          mt={2}
+          pl={4}
+          borderLeft={1}
+          borderStyle={'solid'}
+          borderColor={useColorModeValue('gray.200', 'gray.700')}
+          align={'start'}
+        >
+          {children &&
+            children.map((child) => (
+              <Link key={child.label} py={2} as={RouterLink} to={child.href ?? '#'}>
+                {child.label}
+              </Link>
+            ))}
+        </Stack>
+      </Collapse>
+    </Stack>
+  );
+};
+
+interface NavItem {
+  label: string;
+  subLabel?: string;
+  children?: Array<NavItem>;
+  href?: string;
+  icon?: React.ReactNode;
+}
+
+const NAV_ITEMS: Array<NavItem> = [
+  {
+    label: 'Calendar',
+    href: '/calendar',
+    icon: <CustomCalendarIcon fontSize="1.2em" color="brand.500" />,
+  },
+  {
+    label: 'Friends',
+    href: '/friends',
+    icon: <CustomPeopleIcon fontSize="1.2em" color="brand.500" />,
+  },
+];

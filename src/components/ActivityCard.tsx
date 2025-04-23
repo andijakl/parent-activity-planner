@@ -1,9 +1,135 @@
 import { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Flex, 
+  Text, 
+  Button, 
+  Heading, 
+  HStack, 
+  VStack, 
+  Badge, 
+  Divider, 
+  Icon, 
+  Tag, 
+  TagLabel, 
+  TagLeftIcon, 
+  Skeleton, 
+  SkeletonText, 
+  useColorModeValue
+} from '@chakra-ui/react';
 import { Activity, User } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { joinActivity, expressInterest, leaveActivity } from '../services/activityService';
 import { getUserById } from '../services/userService';
 import { formatDateForDisplay } from '../utils/helpers';
+
+// Custom icons
+type IconProps = Record<string, unknown>;
+
+function CalendarIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" 
+      />
+    </Icon>
+  );
+}
+
+function ClockIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
+      />
+    </Icon>
+  );
+}
+
+function LocationIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+      />
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+      />
+    </Icon>
+  );
+}
+
+function PersonIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+      />
+    </Icon>
+  );
+}
+
+function PlusIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
+      />
+    </Icon>
+  );
+}
+
+function CloseIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M6 18L18 6M6 6l12 12" 
+      />
+    </Icon>
+  );
+}
+
+function BookmarkIcon(props: IconProps) {
+  return (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <path 
+        fill="currentColor"
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth="2" 
+        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" 
+      />
+    </Icon>
+  );
+}
 
 interface ActivityCardProps {
   activity: Activity;
@@ -20,6 +146,11 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
   const isCreator = currentUser?.id === activity.createdBy;
   const isParticipant = activity.participants.includes(currentUser?.id || '');
   const isInterested = activity.interestedUsers.includes(currentUser?.id || '');
+  
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const headerBg = useColorModeValue('brand.50', 'brand.900');
+  const headerColor = useColorModeValue('brand.700', 'white');
+  const borderColor = useColorModeValue('gray.100', 'gray.700');
   
   useEffect(() => {
     async function loadUsers() {
@@ -82,157 +213,175 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
   
   if (loading) {
     return (
-      <div className="animate-pulse bg-white rounded-lg shadow-md p-4 mb-4">
-        <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-        <div className="flex space-x-2 mb-3">
-          <div className="h-8 bg-gray-200 rounded w-16"></div>
-          <div className="h-8 bg-gray-200 rounded w-16"></div>
-        </div>
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-        <div className="flex flex-wrap gap-1 mt-1">
-          <div className="h-6 bg-gray-200 rounded-full w-24"></div>
-          <div className="h-6 bg-gray-200 rounded-full w-24"></div>
-        </div>
-      </div>
+      <Box 
+        borderWidth="1px" 
+        borderRadius="lg" 
+        overflow="hidden"
+        boxShadow="sm" 
+        bg={cardBg}
+        mb={4}
+      >
+        <Box p={4}>
+          <SkeletonText mt="2" noOfLines={1} spacing="4" skeletonHeight="6" width="70%" />
+          <HStack spacing={4} mt={4}>
+            <SkeletonText mt="2" noOfLines={3} spacing="4" skeletonHeight="3" width="60%" />
+            <Flex justifyContent="flex-end" flex={1}>
+              <Skeleton height="36px" width="90px" />
+            </Flex>
+          </HStack>
+          <Divider my={4} />
+          <SkeletonText mt="2" noOfLines={1} spacing="4" skeletonHeight="3" width="30%" />
+          <Flex mt={2} flexWrap="wrap" gap={2}>
+            <Skeleton height="22px" width="100px" borderRadius="full" />
+            <Skeleton height="22px" width="100px" borderRadius="full" />
+          </Flex>
+        </Box>
+      </Box>
     );
   }
   
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg">
+    <Box 
+      borderWidth="1px" 
+      borderRadius="lg" 
+      overflow="hidden"
+      boxShadow="sm" 
+      bg={cardBg}
+      transition="all 0.2s"
+      _hover={{ boxShadow: "md" }}
+      mb={4}
+    >
       {/* Activity Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b border-blue-100">
-        <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold text-blue-800">{activity.name}</h3>
+      <Box bg={headerBg} px={4} py={3} borderBottomWidth="1px" borderColor={borderColor}>
+        <Flex justify="space-between" align="center">
+          <Heading size="md" color={headerColor}>{activity.name}</Heading>
           {isCreator && (
-            <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+            <Badge colorScheme="brand" variant="subtle" fontSize="xs" px={2} py={1} borderRadius="full">
               Organizer
-            </span>
+            </Badge>
           )}
-        </div>
-      </div>
+        </Flex>
+      </Box>
       
       {/* Activity Details */}
-      <div className="p-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between">
-          <div className="space-y-2">
-            <p className="flex items-center text-gray-700">
-              <svg className="h-4 w-4 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="font-medium">{formatDateForDisplay(activity.date)}</span>
-            </p>
+      <Box p={4}>
+        <Flex 
+          direction={{ base: "column", md: "row" }} 
+          justify="space-between"
+          align={{ base: "flex-start", md: "center" }}
+        >
+          <VStack align="stretch" spacing={2} maxW={{ base: "100%", md: "70%" }}>
+            <HStack>
+              <Icon as={CalendarIcon} color="brand.500" boxSize={4} />
+              <Text fontWeight="medium">{formatDateForDisplay(activity.date)}</Text>
+            </HStack>
             
-            <p className="flex items-center text-gray-700">
-              <svg className="h-4 w-4 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{activity.time}</span>
-            </p>
+            <HStack>
+              <Icon as={ClockIcon} color="brand.500" boxSize={4} />
+              <Text>{activity.time}</Text>
+            </HStack>
             
-            <p className="flex items-center text-gray-700">
-              <svg className="h-4 w-4 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{activity.location}</span>
-            </p>
+            <HStack>
+              <Icon as={LocationIcon} color="brand.500" boxSize={4} />
+              <Text>{activity.location}</Text>
+            </HStack>
             
-            <p className="flex items-center text-gray-600 text-sm">
-              <svg className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Organized by: <span className="font-medium">{creator?.childNickname}'s parent</span>
-            </p>
-          </div>
+            <HStack>
+              <Icon as={PersonIcon} color="brand.500" boxSize={4} />
+              <Text fontSize="sm">Organized by: <Text as="span" fontWeight="medium">{creator?.childNickname}'s parent</Text></Text>
+            </HStack>
+          </VStack>
           
           {/* Action Buttons */}
-          <div className="mt-4 sm:mt-0 flex sm:flex-col gap-2">
+          <VStack spacing={2} mt={{ base: 4, md: 0 }}>
             {!isCreator && !isParticipant && (
-              <button
+              <Button
                 onClick={handleJoin}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 
-                          transition duration-150 text-sm font-medium flex items-center justify-center"
+                leftIcon={<PlusIcon />}
+                colorScheme="brand"
+                size="sm"
+                width="full"
               >
-                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
                 Join
-              </button>
+              </Button>
             )}
             
             {isParticipant && !isCreator && (
-              <button
+              <Button
                 onClick={handleLeave}
-                className="flex-1 px-4 py-2 bg-red-100 text-red-600 border border-red-200 
-                          rounded-md hover:bg-red-200 transition duration-150 text-sm font-medium 
-                          flex items-center justify-center"
+                leftIcon={<CloseIcon />}
+                colorScheme="red"
+                variant="outline"
+                size="sm"
+                width="full"
               >
-                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
                 Leave
-              </button>
+              </Button>
             )}
             
             {!isCreator && !isParticipant && !isInterested && (
-              <button
+              <Button
                 onClick={handleInterest}
-                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 border border-gray-200 
-                          rounded-md hover:bg-gray-200 transition duration-150 text-sm font-medium 
-                          flex items-center justify-center"
+                leftIcon={<BookmarkIcon />}
+                colorScheme="gray"
+                variant="outline"
+                size="sm"
+                width="full"
               >
-                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
                 Interested
-              </button>
+              </Button>
             )}
-          </div>
-        </div>
+          </VStack>
+        </Flex>
         
         {/* Participants section */}
-        <div className="mt-4 border-t border-gray-100 pt-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
+        <Divider my={4} />
+        <Box>
+          <Text fontSize="sm" fontWeight="medium" mb={2}>
             Participants ({participants.length}):
-          </h4>
-          <div className="flex flex-wrap gap-1">
+          </Text>
+          <Flex flexWrap="wrap" gap={2}>
             {participants.map(participant => (
-              <span
+              <Tag
                 key={participant.id}
-                className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2.5 py-0.5 rounded-full"
+                size="sm"
+                borderRadius="full"
+                variant="subtle"
+                colorScheme="brand"
               >
-                <span className="h-2 w-2 mr-1 bg-blue-500 rounded-full"></span>
-                {participant.childNickname}'s parent
-              </span>
+                <TagLeftIcon boxSize="2" as={() => <Box boxSize="2" borderRadius="full" bg="brand.500" />} />
+                <TagLabel>{participant.childNickname}'s parent</TagLabel>
+              </Tag>
             ))}
             {participants.length === 0 && (
-              <span className="text-sm text-gray-500 italic">No participants yet</span>
+              <Text fontSize="sm" fontStyle="italic" color="gray.500">No participants yet</Text>
             )}
-          </div>
-        </div>
+          </Flex>
+        </Box>
         
         {/* Interested users section */}
         {interestedUsers.length > 0 && (
-          <div className="mt-3">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
+          <Box mt={3}>
+            <Text fontSize="sm" fontWeight="medium" mb={2}>
               Interested ({interestedUsers.length}):
-            </h4>
-            <div className="flex flex-wrap gap-1">
+            </Text>
+            <Flex flexWrap="wrap" gap={2}>
               {interestedUsers.map(user => (
-                <span
+                <Tag
                   key={user.id}
-                  className="inline-flex items-center bg-gray-100 text-gray-800 text-xs px-2.5 py-0.5 rounded-full"
+                  size="sm"
+                  borderRadius="full"
+                  variant="subtle"
+                  colorScheme="gray"
                 >
-                  <span className="h-2 w-2 mr-1 bg-gray-400 rounded-full"></span>
-                  {user.childNickname}'s parent
-                </span>
+                  <TagLeftIcon boxSize="2" as={() => <Box boxSize="2" borderRadius="full" bg="gray.400" />} />
+                  <TagLabel>{user.childNickname}'s parent</TagLabel>
+                </Tag>
               ))}
-            </div>
-          </div>
+            </Flex>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

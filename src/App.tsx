@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Box, Flex } from '@chakra-ui/react';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
@@ -9,13 +10,12 @@ import Calendar from './pages/Calendar';
 import Friends from './pages/Friends';
 
 function App() {
-
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
+        <Flex direction="column" minH="100vh">
           <Navbar />
-          <main>
+          <Box as="main" flex="1" width="100%">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/signin" element={<SignIn />} />
@@ -37,8 +37,8 @@ function App() {
                 } 
               />
             </Routes>
-          </main>
-        </div>
+          </Box>
+        </Flex>
       </AuthProvider>
     </Router>
   );
