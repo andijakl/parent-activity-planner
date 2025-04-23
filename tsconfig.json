@@ -9,6 +9,7 @@
     }
   ],
   "compilerOptions": {
+    "strict": true,
     "jsx": "react-jsx",
     "types": [
       "vite/client"
