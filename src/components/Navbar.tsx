@@ -13,7 +13,7 @@ import {
   Link,
   Popover,
   PopoverTrigger,
-  PopoverContent,
+  PopoverContent,  useColorMode,
   useColorModeValue,
   useDisclosure,
   Avatar,
@@ -81,14 +81,15 @@ function CustomCalendarIcon(props: IconProps) {
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const { currentUser, signOut } = useAuth();
+  const { colorMode } = useColorMode();
 
   return (
     <Box>
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
+        bg={colorMode === 'light' ? 'white' : 'gray.800'}
+        color={colorMode === 'light' ? 'gray.600' : 'white'}
         minH={'60px'}
-        py={{ base: 2 }}
+        py={{ base: 2 }}        
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
@@ -113,9 +114,9 @@ export default function Navbar() {
           <Link
             as={RouterLink}
             to="/"
-            textAlign={useColorModeValue('left', 'center')}
+            textAlign={colorMode === 'light' ? 'left' : 'center'}
             fontFamily={'heading'}
-            color={useColorModeValue('gray.800', 'white')}
+            color={colorMode === 'light' ? 'gray.800' : 'white'}
             _hover={{
               textDecoration: 'none',
             }}
@@ -205,10 +206,11 @@ export default function Navbar() {
 
 const DesktopNav = () => {
   const { currentUser } = useAuth();
-  const linkColor = useColorModeValue('gray.600', 'gray.200');
-  const linkHoverColor = useColorModeValue('brand.500', 'white');
-  const popoverContentBgColor = useColorModeValue('white', 'gray.800');
-
+  const { colorMode } = useColorMode();
+  const linkColor = colorMode === 'light' ? 'gray.600' : 'gray.200';
+  const linkHoverColor = colorMode === 'light' ? 'brand.500' : 'white';
+  const popoverContentBgColor = colorMode === 'light' ? 'white' : 'gray.800';
+  
   if (!currentUser) return null;
 
   return (
@@ -269,7 +271,9 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
       p={2}
       rounded={'md'}
       _hover={{ bg: useColorModeValue('brand.50', 'gray.900') }}
-    >
+    >     
+    
+     
       <Stack direction={'row'} align={'center'}>
         <Box>
           <Text
@@ -299,7 +303,8 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
 
 const MobileNav = () => {
   const { currentUser, signOut } = useAuth();
-  const bgColor = useColorModeValue('white', 'gray.800');
+  const { colorMode } = useColorMode();
+  const bgColor = colorMode === 'light' ? 'white' : 'gray.800';
   
   if (!currentUser) {
     return (
@@ -364,7 +369,7 @@ const MobileNavItem = ({ label, children, href, icon }: NavItem) => {
           <Text
             fontWeight={600}
             color={useColorModeValue('gray.600', 'gray.200')}
-          >
+          >            
             {label}
           </Text>
         </HStack>
@@ -385,7 +390,7 @@ const MobileNavItem = ({ label, children, href, icon }: NavItem) => {
           pl={4}
           borderLeft={1}
           borderStyle={'solid'}
-          borderColor={useColorModeValue('gray.200', 'gray.700')}
+          borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
           align={'start'}
         >
           {children &&

@@ -12,8 +12,8 @@ import {
   Icon,
   Tag,
   TagLabel,
-  TagLeftIcon,
   Skeleton,
+  useColorMode,
   SkeletonText,
   useColorModeValue
 } from '@chakra-ui/react';
@@ -146,11 +146,12 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
   const isCreator = currentUser?.id === activity.createdBy;
   const isParticipant = activity.participants.includes(currentUser?.id || '');
   const isInterested = activity.interestedUsers.includes(currentUser?.id || '');
+  const { colorMode } = useColorMode();
 
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const headerBg = useColorModeValue('brand.50', 'brand.900');
-  const headerColor = useColorModeValue('brand.700', 'white');
-  const borderColor = useColorModeValue('gray.100', 'gray.700');
+  const cardBg = colorMode === 'light' ? 'white' : 'gray.800';
+  const headerBg = colorMode === 'light' ? 'brand.50' : 'brand.900';
+  const headerColor = colorMode === 'light' ? 'brand.700' : 'white';
+  const borderColor = colorMode === 'light' ? 'gray.100' : 'gray.700';
 
   useEffect(() => {
     async function loadUsers() {
@@ -349,7 +350,7 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
                 variant="subtle"
                 colorScheme="brand"
               >
-                <TagLeftIcon boxSize="2" as={() => <Box boxSize="2" borderRadius="full" bg="brand.500" />} />
+                <Box boxSize="2" borderRadius="full" bg="brand.500" marginRight={2}/>
                 <TagLabel>{participant.childNickname}'s parent</TagLabel>
               </Tag>
             ))}
@@ -374,7 +375,7 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
                   variant="subtle"
                   colorScheme="gray"
                 >
-                  <TagLeftIcon boxSize="2" as={() => <Box boxSize="2" borderRadius="full" bg="gray.400" />} />
+                  <Box boxSize="2" borderRadius="full" bg="gray.400" marginRight={2}/>
                   <TagLabel>{user.childNickname}'s parent</TagLabel>
                 </Tag>
               ))}
