@@ -12,10 +12,9 @@ import {
   Icon,
   Tag,
   TagLabel,
+  TagLeftIcon, // Added TagLeftIcon import
   Skeleton,
-  useColorMode,
   SkeletonText,
-  useColorModeValue
 } from '@chakra-ui/react';
 import { Activity, User } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -146,12 +145,6 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
   const isCreator = currentUser?.id === activity.createdBy;
   const isParticipant = activity.participants.includes(currentUser?.id || '');
   const isInterested = activity.interestedUsers.includes(currentUser?.id || '');
-  const { colorMode } = useColorMode();
-
-  const cardBg = colorMode === 'light' ? 'white' : 'gray.800';
-  const headerBg = colorMode === 'light' ? 'brand.50' : 'brand.900';
-  const headerColor = colorMode === 'light' ? 'brand.700' : 'white';
-  const borderColor = colorMode === 'light' ? 'gray.100' : 'gray.700';
 
   useEffect(() => {
     async function loadUsers() {
@@ -219,19 +212,18 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
         borderRadius="lg"
         overflow="hidden"
         boxShadow="sm"
-        bg={cardBg}
         mb={4}
       >
         <Box p={4}>
-          <SkeletonText mt="2" noOfLines={1} spacing="4" skeletonHeight="6" width="70%" />
-          <HStack spacing={4} mt={4}>
-            <SkeletonText mt="2" noOfLines={3} spacing="4" skeletonHeight="3" width="60%" />
+          <SkeletonText mt="2" noOfLines={1} gap="4" height="6" width="70%" />
+          <HStack gap={4} mt={4}>
+            <SkeletonText mt="2" noOfLines={3} gap="4" height="3" width="60%" />
             <Flex justifyContent="flex-end" flex={1}>
               <Skeleton height="36px" width="90px" />
             </Flex>
           </HStack>
           <Separator my={4} />
-          <SkeletonText mt="2" noOfLines={1} spacing="4" skeletonHeight="3" width="30%" />
+          <SkeletonText mt="2" noOfLines={1} gap="4" height="3" width="30%" />
           <Flex mt={2} flexWrap="wrap" gap={2}>
             <Skeleton height="22px" width="100px" borderRadius="full" />
             <Skeleton height="22px" width="100px" borderRadius="full" />
@@ -247,15 +239,21 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
       borderRadius="lg"
       overflow="hidden"
       boxShadow="sm"
-      bg={cardBg}
       transition="all 0.2s"
       _hover={{ boxShadow: "md" }}
       mb={4}
     >
       {/* Activity Header */}
-      <Box bg={headerBg} px={4} py={3} borderBottomWidth="1px" borderColor={borderColor}>
+      <Box
+        bg="brand.subtle"
+        color="brand.text"
+        px={4}
+        py={3}
+        borderBottomWidth="1px"
+        borderColor="chakra-border-color"
+      >
         <Flex justify="space-between" align="center">
-          <Heading size="md" color={headerColor}>{activity.name}</Heading>
+          <Heading size="md">{activity.name}</Heading>
           {isCreator && (
             <Badge colorScheme="brand" variant="subtle" fontSize="xs" px={2} py={1} borderRadius="full">
               Organizer
@@ -271,7 +269,7 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
           justify="space-between"
           align={{ base: "flex-start", md: "center" }}
         >
-          <VStack align="stretch" spacing={2} maxW={{ base: "100%", md: "70%" }}>
+          <VStack align="stretch" gap={2} maxW={{ base: "100%", md: "70%" }}>
             <HStack>
               <Icon as={CalendarIcon} color="brand.500" boxSize={4} />
               <Text fontWeight="medium">{formatDateForDisplay(activity.date)}</Text>
@@ -294,15 +292,15 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
           </VStack>
 
           {/* Action Buttons */}
-          <VStack spacing={2} mt={{ base: 4, md: 0 }}>
+          <VStack gap={2} mt={{ base: 4, md: 0 }}>
             {!isCreator && !isParticipant && (
               <Button
                 onClick={handleJoin}
-                leftIcon={<PlusIcon />}
                 colorScheme="brand"
                 size="sm"
                 width="full"
               >
+                <PlusIcon mr={2} />
                 Join
               </Button>
             )}
@@ -310,12 +308,12 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
             {isParticipant && !isCreator && (
               <Button
                 onClick={handleLeave}
-                leftIcon={<CloseIcon />}
                 colorScheme="red"
                 variant="outline"
                 size="sm"
                 width="full"
               >
+                <CloseIcon mr={2} />
                 Leave
               </Button>
             )}
@@ -323,12 +321,12 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
             {!isCreator && !isParticipant && !isInterested && (
               <Button
                 onClick={handleInterest}
-                leftIcon={<BookmarkIcon />}
                 colorScheme="gray"
                 variant="outline"
                 size="sm"
                 width="full"
               >
+                <BookmarkIcon mr={2} />
                 Interested
               </Button>
             )}
@@ -350,7 +348,9 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
                 variant="subtle"
                 colorScheme="brand"
               >
-                <Box boxSize="2" borderRadius="full" bg="brand.500" marginRight={2}/>
+                <TagLeftIcon boxSize="12px" as={() => (
+                  <Box boxSize="2" borderRadius="full" bg="brand.500" />
+                )} />
                 <TagLabel>{participant.childNickname}'s parent</TagLabel>
               </Tag>
             ))}
@@ -375,7 +375,9 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
                   variant="subtle"
                   colorScheme="gray"
                 >
-                  <Box boxSize="2" borderRadius="full" bg="gray.400" marginRight={2}/>
+                  <TagLeftIcon boxSize="12px" as={() => (
+                    <Box boxSize="2" borderRadius="full" bg="gray.400" />
+                  )} />
                   <TagLabel>{user.childNickname}'s parent</TagLabel>
                 </Tag>
               ))}
