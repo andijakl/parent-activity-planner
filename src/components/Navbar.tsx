@@ -13,7 +13,7 @@ import {
   Link,
   Popover,
   PopoverTrigger,
-  PopoverContent,  useColorMode,
+  PopoverContent,
   useColorModeValue,
   useDisclosure,
   Avatar,
@@ -23,12 +23,13 @@ import {
   MenuItem,
   HStack,
 } from '@chakra-ui/react';
-import { 
-  HamburgerIcon, 
-  CloseIcon, 
-  ChevronDownIcon, 
-  ChevronRightIcon,
-} from '@chakra-ui/icons';
+import { useColorMode } from '@chakra-ui/react';
+import {
+  RxHamburgerMenu as HamburgerIcon,
+  RxCross1 as CloseIcon,
+  RxChevronDown as ChevronDownIcon,
+  RxChevronRight as ChevronRightIcon,
+} from 'react-icons/rx';
 
 // Define a type for icon props
 type IconProps = Record<string, unknown>;
@@ -89,7 +90,7 @@ export default function Navbar() {
         bg={colorMode === 'light' ? 'white' : 'gray.800'}
         color={colorMode === 'light' ? 'gray.600' : 'white'}
         minH={'60px'}
-        py={{ base: 2 }}        
+        py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
@@ -104,12 +105,12 @@ export default function Navbar() {
         >
           <IconButton
             onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+            icon={isOpen ? <CloseIcon size={12} /> : <HamburgerIcon size={20} />}
             variant={'ghost'}
             aria-label={'Toggle Navigation'}
           />
         </Flex>
-        
+
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Link
             as={RouterLink}
@@ -210,7 +211,7 @@ const DesktopNav = () => {
   const linkColor = colorMode === 'light' ? 'gray.600' : 'gray.200';
   const linkHoverColor = colorMode === 'light' ? 'brand.500' : 'white';
   const popoverContentBgColor = colorMode === 'light' ? 'white' : 'gray.800';
-  
+
   if (!currentUser) return null;
 
   return (
@@ -271,9 +272,9 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
       p={2}
       rounded={'md'}
       _hover={{ bg: useColorModeValue('brand.50', 'gray.900') }}
-    >     
-    
-     
+    >
+
+
       <Stack direction={'row'} align={'center'}>
         <Box>
           <Text
@@ -305,7 +306,7 @@ const MobileNav = () => {
   const { currentUser, signOut } = useAuth();
   const { colorMode } = useColorMode();
   const bgColor = colorMode === 'light' ? 'white' : 'gray.800';
-  
+
   if (!currentUser) {
     return (
       <Stack
@@ -318,7 +319,7 @@ const MobileNav = () => {
       </Stack>
     );
   }
-  
+
   return (
     <Stack
       bg={bgColor}
@@ -330,14 +331,14 @@ const MobileNav = () => {
           {currentUser.childNickname}'s Parent
         </Text>
       </Box>
-      
+
       {NAV_ITEMS.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
-      
+
       <Box pt={2}>
-        <Button 
-          width="full" 
+        <Button
+          width="full"
           onClick={signOut}
           variant="outline"
           colorScheme="brand"
@@ -369,7 +370,7 @@ const MobileNavItem = ({ label, children, href, icon }: NavItem) => {
           <Text
             fontWeight={600}
             color={useColorModeValue('gray.600', 'gray.200')}
-          >            
+          >
             {label}
           </Text>
         </HStack>
