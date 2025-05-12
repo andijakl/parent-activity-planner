@@ -5,25 +5,18 @@ import {
   Box,
   Flex,
   Text,
-  IconButton,
   Button,
   Stack,
-  Collapse,
+  Collapsible,
   Icon,
   Link,
   Popover,
-  PopoverTrigger,
-  PopoverContent,
-  useColorModeValue,
-  useDisclosure,
-  Avatar,
   Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
+  Avatar,
   HStack,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useColorMode } from '@chakra-ui/react';
+import { useColorMode } from '../components/ui/color-mode';
 import {
   RxHamburgerMenu as HamburgerIcon,
   RxCross1 as CloseIcon,
@@ -80,7 +73,7 @@ function CustomCalendarIcon(props: IconProps) {
 }
 
 export default function Navbar() {
-  const { isOpen, onToggle } = useDisclosure();
+  const { open, onToggle } = useDisclosure();
   const { currentUser, signOut } = useAuth();
   const { colorMode } = useColorMode();
 
@@ -94,7 +87,7 @@ export default function Navbar() {
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.900'}
         align={'center'}
         boxShadow="sm"
       >
@@ -103,18 +96,18 @@ export default function Navbar() {
           ml={{ base: -2 }}
           display={{ base: 'flex', md: 'none' }}
         >
-          <IconButton
+          <Button
             onClick={onToggle}
-            icon={isOpen ? <CloseIcon size={12} /> : <HamburgerIcon size={20} />}
             variant={'ghost'}
             aria-label={'Toggle Navigation'}
-          />
+          >
+            {open ? <CloseIcon size={12} /> : <HamburgerIcon size={20} />}
+          </Button>
         </Flex>
 
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Link
-            as={RouterLink}
-            to="/"
+            asChild
             textAlign={colorMode === 'light' ? 'left' : 'center'}
             fontFamily={'heading'}
             color={colorMode === 'light' ? 'gray.800' : 'white'}
@@ -122,17 +115,19 @@ export default function Navbar() {
               textDecoration: 'none',
             }}
           >
-            <HStack>
-              <CustomSunIcon w={6} h={6} color="brand.500" />
-              <Text
-                fontWeight={700}
-                fontSize="lg"
-                bgGradient="linear(to-r, brand.500, brand.700)"
-                bgClip="text"
-              >
-                ParentPlanner
-              </Text>
-            </HStack>
+            <RouterLink to="/">
+              <HStack>
+                <CustomSunIcon w={6} h={6} color="brand.500" />
+                <Text
+                  fontWeight={700}
+                  fontSize="lg"
+                  bgGradient="linear(to-r, brand.500, brand.700)"
+                  bgClip="text"
+                >
+                  ParentPlanner
+                </Text>
+              </HStack>
+            </RouterLink>
           </Link>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
@@ -144,63 +139,80 @@ export default function Navbar() {
           flex={{ base: 1, md: 0 }}
           justify={'flex-end'}
           direction={'row'}
-          spacing={6}
+          gap={6}
         >
           {currentUser ? (
-            <Menu>
-              <MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
-                <HStack>
-                  <Avatar
-                    size={'sm'}
-                    src={''}
-                    name={`${currentUser.childNickname}'s Parent`}
-                    bg="brand.500"
-                  />
-                  <Text display={{ base: 'none', md: 'flex' }}>
-                    {currentUser.childNickname}'s Parent
-                  </Text>
-                </HStack>
-              </MenuButton>
-              <MenuList zIndex={2}>
-                <MenuItem as={RouterLink} to="/calendar" icon={<CustomCalendarIcon fontSize="1.2em" />}>
-                  Calendar
-                </MenuItem>
-                <MenuItem as={RouterLink} to="/friends" icon={<CustomPeopleIcon fontSize="1.2em" />}>
-                  Friends
-                </MenuItem>
-                <MenuItem onClick={signOut}>Sign Out</MenuItem>
-              </MenuList>
-            </Menu>
+            <Menu.Root>
+              <Menu.Trigger asChild>
+                <Button rounded={'full'} variant={'ghost'} cursor={'pointer'} minW={0}>
+                  <HStack>
+                    <Avatar.Root size={'sm'}>
+                      <Avatar.Fallback name={`${currentUser.childNickname}'s Parent`} bg="brand.500" />
+                    </Avatar.Root>
+                    <Text display={{ base: 'none', md: 'flex' }}>
+                      {currentUser.childNickname}'s Parent
+                    </Text>
+                  </HStack>
+                </Button>
+              </Menu.Trigger>
+              <Menu.Positioner>
+                <Menu.Content zIndex={2}>
+                  <Menu.Item asChild value="calendar">
+                    <RouterLink to="/calendar">
+                      <HStack>
+                        <CustomCalendarIcon fontSize="1.2em" />
+                        <span>Calendar</span>
+                      </HStack>
+                    </RouterLink>
+                  </Menu.Item>
+                  <Menu.Item asChild value="friends">
+                    <RouterLink to="/friends">
+                      <HStack>
+                        <CustomPeopleIcon fontSize="1.2em" />
+                        <span>Friends</span>
+                      </HStack>
+                    </RouterLink>
+                  </Menu.Item>
+                  <Menu.Item onClick={signOut} value="signout">Sign Out</Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Menu.Root>
           ) : (
             <>
-              <Button
-                as={RouterLink}
-                fontSize={'sm'}
-                fontWeight={400}
-                variant={'link'}
-                to={'/signin'}
-              >
-                Sign In
-              </Button>
-              <Button
-                as={RouterLink}
-                display={{ base: 'none', md: 'inline-flex' }}
-                fontSize={'sm'}
-                fontWeight={600}
-                to={'/signup'}
-                colorScheme="brand"
-                variant="solid"
-              >
-                Sign Up
-              </Button>
+              <Link asChild>
+                <RouterLink to={'/signin'}>
+                  <Button
+                    fontSize={'sm'}
+                    fontWeight={400}
+                    variant={'ghost'}
+                  >
+                    Sign In
+                  </Button>
+                </RouterLink>
+              </Link>
+
+              <Link asChild display={{ base: 'none', md: 'inline-flex' }}>
+                <RouterLink to={'/signup'}>
+                  <Button
+                    fontSize={'sm'}
+                    fontWeight={600}
+                    colorPalette="brand"
+                    variant="solid"
+                  >
+                    Sign Up
+                  </Button>
+                </RouterLink>
+              </Link>
             </>
           )}
         </Stack>
       </Flex>
 
-      <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
-      </Collapse>
+      <Collapsible.Root open={open}>
+        <Collapsible.Content>
+          <MobileNav />
+        </Collapsible.Content>
+      </Collapsible.Root>
     </Box>
   );
 }
@@ -215,32 +227,34 @@ const DesktopNav = () => {
   if (!currentUser) return null;
 
   return (
-    <Stack direction={'row'} spacing={4}>
+    <Stack direction={'row'} gap={4}>
       {NAV_ITEMS.map((navItem) => (
         <Box key={navItem.label}>
-          <Popover trigger={'hover'} placement={'bottom-start'}>
-            <PopoverTrigger>
-              <Link
-                as={RouterLink}
-                p={2}
-                to={navItem.href ?? '#'}
-                fontSize={'sm'}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                <HStack spacing={1}>
-                  {navItem.icon}
-                  <Text>{navItem.label}</Text>
-                </HStack>
+          <Popover.Root>
+            <Popover.Trigger asChild>
+              <Link asChild>
+                <RouterLink to={navItem.href ?? '#'}>
+                  <Box
+                    p={2}
+                    fontSize={'sm'}
+                    fontWeight={500}
+                    color={linkColor}
+                    _hover={{
+                      textDecoration: 'none',
+                      color: linkHoverColor,
+                    }}
+                  >
+                    <HStack gap={1}>
+                      {navItem.icon}
+                      <Text>{navItem.label}</Text>
+                    </HStack>
+                  </Box>
+                </RouterLink>
               </Link>
-            </PopoverTrigger>
+            </Popover.Trigger>
 
             {navItem.children && (
-              <PopoverContent
+              <Popover.Content
                 border={0}
                 boxShadow={'xl'}
                 bg={popoverContentBgColor}
@@ -253,9 +267,9 @@ const DesktopNav = () => {
                     <DesktopSubNav key={child.label} {...child} />
                   ))}
                 </Stack>
-              </PopoverContent>
+              </Popover.Content>
             )}
-          </Popover>
+          </Popover.Root>
         </Box>
       ))}
     </Stack>
@@ -264,40 +278,40 @@ const DesktopNav = () => {
 
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   return (
-    <Link
-      as={RouterLink}
-      to={href ?? '#'}
-      role={'group'}
-      display={'block'}
-      p={2}
-      rounded={'md'}
-      _hover={{ bg: useColorModeValue('brand.50', 'gray.900') }}
-    >
-
-
-      <Stack direction={'row'} align={'center'}>
-        <Box>
-          <Text
-            transition={'all .3s ease'}
-            _groupHover={{ color: 'brand.500' }}
-            fontWeight={500}
-          >
-            {label}
-          </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
-          opacity={0}
-          _groupHover={{ opacity: 1, transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
-          flex={1}
+    <Link asChild>
+      <RouterLink to={href ?? '#'}>
+        <Box
+          role={'group'}
+          display={'block'}
+          p={2}
+          rounded={'md'}
+          _hover={{ bg: 'brand.50' }}
         >
-          <Icon color={'brand.500'} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
+          <Stack direction={'row'} align={'center'}>
+            <Box>
+              <Text
+                transition={'all .3s ease'}
+                _groupHover={{ color: 'brand.500' }}
+                fontWeight={500}
+              >
+                {label}
+              </Text>
+              <Text fontSize={'sm'}>{subLabel}</Text>
+            </Box>
+            <Flex
+              transition={'all .3s ease'}
+              transform={'translateX(-10px)'}
+              opacity={0}
+              _groupHover={{ opacity: 1, transform: 'translateX(0)' }}
+              justify={'flex-end'}
+              align={'center'}
+              flex={1}
+            >
+              <Icon color={'brand.500'} w={5} h={5} as={ChevronRightIcon} />
+            </Flex>
+          </Stack>
+        </Box>
+      </RouterLink>
     </Link>
   );
 };
@@ -341,7 +355,7 @@ const MobileNav = () => {
           width="full"
           onClick={signOut}
           variant="outline"
-          colorScheme="brand"
+          colorPalette="brand"
         >
           Sign Out
         </Button>
@@ -351,57 +365,67 @@ const MobileNav = () => {
 };
 
 const MobileNavItem = ({ label, children, href, icon }: NavItem) => {
-  const { isOpen, onToggle } = useDisclosure();
+  const { open, onToggle } = useDisclosure();
+  const { colorMode } = useColorMode();
 
   return (
-    <Stack spacing={4} onClick={children && onToggle}>
-      <Flex
-        py={2}
-        as={RouterLink}
-        to={href ?? '#'}
-        justify={'space-between'}
-        align={'center'}
-        _hover={{
-          textDecoration: 'none',
-        }}
-      >
-        <HStack spacing={2}>
-          {icon}
-          <Text
-            fontWeight={600}
-            color={useColorModeValue('gray.600', 'gray.200')}
-          >
-            {label}
-          </Text>
-        </HStack>
-        {children && (
-          <Icon
-            as={ChevronDownIcon}
-            transition={'all .25s ease-in-out'}
-            transform={isOpen ? 'rotate(180deg)' : ''}
-            w={6}
-            h={6}
-          />
-        )}
+    <Stack gap={4} onClick={children && onToggle}>
+      <Flex py={2}>
+        <Link asChild width="full">
+          <RouterLink to={href ?? '#'}>
+            <Flex
+              justify={'space-between'}
+              align={'center'}
+              _hover={{
+                textDecoration: 'none',
+              }}
+            >
+              <HStack gap={2}>
+                {icon}
+                <Text
+                  fontWeight={600}
+                  color={colorMode === 'light' ? 'gray.600' : 'gray.200'}
+                >
+                  {label}
+                </Text>
+              </HStack>
+              {children && (
+                <Icon
+                  as={ChevronDownIcon}
+                  transition={'all .25s ease-in-out'}
+                  transform={open ? 'rotate(180deg)' : ''}
+                  w={6}
+                  h={6}
+                />
+              )}
+            </Flex>
+          </RouterLink>
+        </Link>
       </Flex>
 
-      <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle={'solid'}
-          borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
-          align={'start'}
-        >
-          {children &&
-            children.map((child) => (
-              <Link key={child.label} py={2} as={RouterLink} to={child.href ?? '#'}>
-                {child.label}
-              </Link>
-            ))}
-        </Stack>
-      </Collapse>
+      <Collapsible.Root open={open}>
+        <Collapsible.Content>
+          <Stack
+            mt={2}
+            pl={4}
+            borderLeft={1}
+            borderStyle={'solid'}
+            borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
+            align={'start'}
+          >
+            {children &&
+              children.map((child) => (
+                <Link key={child.label} asChild>
+                  <RouterLink to={child.href ?? '#'}>
+                    <Box py={2}>
+                      {child.label}
+                    </Box>
+                  </RouterLink>
+                </Link>
+              ))}
+          </Stack>
+        </Collapsible.Content>
+      </Collapsible.Root>
     </Stack>
   );
 };
