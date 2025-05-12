@@ -10,9 +10,6 @@ import {
   Badge,
   Separator,
   Icon,
-  Tag,
-  TagLabel,
-  TagLeftIcon, // Added TagLeftIcon import
   Skeleton,
   SkeletonText,
 } from '@chakra-ui/react';
@@ -341,18 +338,21 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
           </Text>
           <Flex flexWrap="wrap" gap={2}>
             {participants.map(participant => (
-              <Tag
+              <Box
                 key={participant.id}
-                size="sm"
+                as="span"
+                px={3}
+                py={1}
                 borderRadius="full"
-                variant="subtle"
-                colorScheme="brand"
+                fontSize="sm"
+                bg="brand.100"
+                color="brand.800"
+                display="inline-flex"
+                alignItems="center"
               >
-                <TagLeftIcon boxSize="12px" as={() => (
-                  <Box boxSize="2" borderRadius="full" bg="brand.500" />
-                )} />
-                <TagLabel>{participant.childNickname}'s parent</TagLabel>
-              </Tag>
+                <Box boxSize="2" borderRadius="full" bg="brand.500" mr={2} />
+                <Text>{participant.childNickname}'s parent</Text>
+              </Box>
             ))}
             {participants.length === 0 && (
               <Text fontSize="sm" fontStyle="italic" color="gray.500">No participants yet</Text>
@@ -368,18 +368,21 @@ export default function ActivityCard({ activity, refreshActivities }: ActivityCa
             </Text>
             <Flex flexWrap="wrap" gap={2}>
               {interestedUsers.map(user => (
-                <Tag
+                <Box
                   key={user.id}
-                  size="sm"
+                  as="span"
+                  px={3}
+                  py={1}
                   borderRadius="full"
-                  variant="subtle"
-                  colorScheme="gray"
+                  fontSize="sm"
+                  bg="gray.100"
+                  color="gray.700"
+                  display="inline-flex"
+                  alignItems="center"
                 >
-                  <TagLeftIcon boxSize="12px" as={() => (
-                    <Box boxSize="2" borderRadius="full" bg="gray.400" />
-                  )} />
-                  <TagLabel>{user.childNickname}'s parent</TagLabel>
-                </Tag>
+                  <Box boxSize="2" borderRadius="full" bg="gray.400" mr={2} />
+                  <Text>{user.childNickname}'s parent</Text>
+                </Box>
               ))}
             </Flex>
           </Box>

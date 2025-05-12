@@ -78,7 +78,7 @@ export default function Navbar() {
   const { colorMode } = useColorMode();
 
   return (
-    <Box>
+    <Box width="100%">
       <Flex
         bg={colorMode === 'light' ? 'white' : 'gray.800'}
         color={colorMode === 'light' ? 'gray.600' : 'white'}
@@ -90,6 +90,7 @@ export default function Navbar() {
         borderColor={colorMode === 'light' ? 'gray.200' : 'gray.900'}
         align={'center'}
         boxShadow="sm"
+        width="100%"
       >
         <Flex
           flex={{ base: 1, md: 'auto' }}

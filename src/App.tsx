@@ -13,28 +13,28 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Flex direction="column" minH="100vh">
+        <Flex direction="column" minH="100vh" width="100%">
           <Navbar />
           <Box as="main" flex="1" width="100%">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route 
-                path="/calendar" 
+              <Route
+                path="/calendar"
                 element={
                   <PrivateRoute>
                     <Calendar />
                   </PrivateRoute>
-                } 
+                }
               />
-              <Route 
-                path="/friends" 
+              <Route
+                path="/friends"
                 element={
                   <PrivateRoute>
                     <Friends />
                   </PrivateRoute>
-                } 
+                }
               />
             </Routes>
           </Box>
